@@ -1,5 +1,5 @@
 # Friendsweeper
-https://media.giphy.com/media/41QRnehnyVEzK/giphy.gif
+![](http://i.imgur.com/7hSn71a.gif)
 
 ### What is this?
 A simple tool that automates erasing all public evidence of your friendship with someone on Facebook. Since Facebook doesn't delete wall post history between you and a friend, even
