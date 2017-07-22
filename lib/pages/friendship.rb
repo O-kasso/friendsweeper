@@ -1,25 +1,75 @@
-class FriendshipPage < WatirDrops::PageObject
-  page_url { "https://www.facebook.com/friendship/#{ENV['my_username']}/#{ENV['friend_username']}/" }
+require_relative './base_page'
 
-  element(:feed) { browser.div(css: "[role='feed']") }
-  element(:story) { feed.div(css: "[role='article']") }
-  element(:story_options) { story.a(css: "[aria-label='Story options']") }
-  element(:story_options_menu) { browser.ul(css: "[role='menu']") }
-  element(:story_delete_option) do
-    story_options_menu.li(css: "[data-feed-option-name='FeedDeleteOption']")
-  end
-  element(:overlay_footer) { browser.div(class: 'uiOverlayFooter') }
-  element(:confirm_delete_btn) do
-    overlay_footer.button(class: 'layerConfirm uiOverlayButton')
+class FriendshipPage < BasePage
+  def initialize(user, friend)
+    @user = user
+    @friend = friend
+    @url = "https://www.facebook.com/friendship/#{@user}/#{@friend}"
   end
 
-  def open_story_menu
-    story_options.click
+  def launch
+    visit @url
   end
 
-  def delete_story
-    story_delete_option.click
-    overlay_footer.wait_until_present
-    confirm_delete_btn.click
+  def delete_latest_story
+    delete_story(latest_story)
+  end
+
+  def delete_all_visible_stories
+    visible_stories.each do |s|
+      delete_story(s)
+      byebug
+    end
+  end
+
+  private
+
+  def feed
+    first("div[role='feed']", wait: 10)
+  end
+
+  def latest_story
+    within feed do
+      first "div[role='article']"
+    end
+  end
+
+  def visible_stories
+    within feed do
+      all "div[role='article']"
+    end
+  end
+
+  def story_option_button
+    find_link 'Story options'
+  end
+
+  def story_option_menu
+    find "ul[role='menu']"
+  end
+
+  def delete_option
+    within story_option_menu do
+      find "a[data-feed-option-name='FeedDeleteOption']"
+    end
+  end
+
+  def confirm_delete_button
+    within 'div.uiOverlayFooter' do
+      find 'button.layerConfirm.uiOverlayButton'
+    end
+  end
+
+  def delete_story(story)
+    open_story_options(story)
+    delete_option.click
+    confirm_delete_button.click
+    byebug
+  end
+
+  def open_story_options(story)
+    within story do
+      story_option_button.click
+    end
   end
 end

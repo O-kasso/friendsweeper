@@ -3,8 +3,10 @@
 require 'rubygems'
 require 'commander'
 require 'io/console'
-require 'watir_drops'
+require 'capybara'
+require 'selenium-webdriver'
 require_relative '../lib/pages/friendship'
+require 'byebug'
 
 class FriendSweeper
   include Commander::Methods
@@ -20,35 +22,40 @@ class FriendSweeper
       c.description = 'Delete all public stories between you and a (former?) friend'
       c.action do |args, options|
         puts 'Make sure you know the Facebook usernames of both yourself and your friend. More info can be found at https://www.facebook.com/username'
-        ENV['my_username'] = ask 'Your Facebook username: '
-        ENV['friend_username'] = ask 'Username of friend you wish to erase: '
+        username = ask 'Your Facebook username: '
+        friend_username = ask 'Username of friend you wish to erase: '
 
-        puts 'Launching Facebook! You have 60 seconds to login so the script can continue!'
+        puts 'Launching Facebook! You have 15 seconds to login so the script can continue!'
 
-        Watir.default_timeout = 60
-        WatirDrops::PageObject.browser = Watir::Browser.new :chrome, args: [
-          '--disable-notifications',
-          '--disable-save-password',
-          '--disable-infobars',
-          '--disable-extensions'
-        ]
+        chrome_switches = Selenium::WebDriver::Remote::Capabilities.chrome(
+          chromeOptions: {
+            args: [
+              '--disable-notifications',
+              '--disable-save-password',
+              '--disable-infobars',
+              '--disable-extensions',
+              '--start-maximized'
+            ]
+          }
+        )
 
-        WatirDrops::PageObject.browser.window.maximize
+        Capybara::Selenium::Driver.class_eval { def quit; end } # prevent browser quitting after execution completes
+        Capybara.register_driver :selenium do |app|
+          Capybara::Selenium::Driver.new(app,
+                                         browser: :chrome,
+                                         desired_capabilities: chrome_switches)
+        end
 
-        friendship_page = FriendshipPage.visit
+        Capybara.default_driver = :selenium
+        Capybara.enable_aria_label = true
 
+        friendship_page = FriendshipPage.new(username, friend_username)
+        friendship_page.launch
+        sleep 15
         begin
-          loop do
-            friendship_page.open_story_menu
-            friendship_page.delete_story
-            # previously deleted story may still be cached, so wait a bit before refreshing
-            sleep 3
-            # refresh after deleting a story to avoid feed layout issues
-            WatirDrops::PageObject.browser.refresh
-          end
-        rescue => e
-          puts "Error: #{e}"
-          puts "Either something broke, or we've successfully erased all Friendship activity! Have a good day!"
+          friendship_page.delete_latest_story
+        rescue Exception => e
+          puts e
         end
       end
     end
