@@ -6,11 +6,9 @@ require 'io/console'
 require 'capybara'
 require 'selenium-webdriver'
 require_relative '../lib/pages/friendship'
-require 'byebug'
 
 class FriendSweeper
   include Commander::Methods
-  # include whatever modules you need
 
   def run
     program :name, 'friendsweeper'
@@ -49,11 +47,13 @@ class FriendSweeper
         Capybara.default_driver = :selenium
         Capybara.enable_aria_label = true
 
-        friendship_page = FriendshipPage.new(username, friend_username)
-        friendship_page.launch
-        sleep 15
+        friendship_page = FriendshipPage.new
+        # TODO take out test values
+        friendship_page.load(user: username, friend: friend_username)
+        sleep 12
+
         begin
-          friendship_page.delete_latest_story
+          friendship_page.delete_all_visible_stories
         rescue Exception => e
           puts e
         end

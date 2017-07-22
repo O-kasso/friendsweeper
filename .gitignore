@@ -4,9 +4,6 @@
 **/*.sw[a-p]
 .netrwhist
 
-# Invoker gem
-invoker.ini
-
 # CTags
 tags
 
@@ -47,3 +44,7 @@ tags
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Debugger #
+############
+.byebug_history

@@ -1,75 +1,55 @@
-require_relative './base_page'
+require 'capybara/dsl'
+require 'site_prism'
 
-class FriendshipPage < BasePage
-  def initialize(user, friend)
-    @user = user
-    @friend = friend
-    @url = "https://www.facebook.com/friendship/#{@user}/#{@friend}"
-  end
+class FriendshipPage < SitePrism::Page
+  set_url "https://www.facebook.com/friendship{/user}{/friend}"
 
-  def launch
-    visit @url
-  end
+  element :main, ".fb_content[role='main']"
+  elements :story_group, "[role='feed']"
+  elements :stories, "[role='article']"
+  element :story_options_menu, :xpath, "//ul[@role='menu']"
+  element :delete_option, "a[data-feed-option-name='FeedDeleteOption']"
+  element :confirm_delete_button,
+          :xpath,
+          "//button[contains( normalize-space( @class ), ' layerConfirm ' )]"
 
   def delete_latest_story
-    delete_story(latest_story)
+    within story_group.first do
+      delete_story(stories.first)
+    end
   end
 
   def delete_all_visible_stories
-    visible_stories.each do |s|
-      delete_story(s)
-      byebug
+    story_group.each do |sg|
+      within sg do
+        stories.each do |s|
+          delete_story(s)
+        end
+      end
     end
   end
 
   private
 
-  def feed
-    first("div[role='feed']", wait: 10)
-  end
-
-  def latest_story
-    within feed do
-      first "div[role='article']"
-    end
-  end
-
-  def visible_stories
-    within feed do
-      all "div[role='article']"
-    end
-  end
-
-  def story_option_button
-    find_link 'Story options'
-  end
-
-  def story_option_menu
-    find "ul[role='menu']"
-  end
-
-  def delete_option
-    within story_option_menu do
-      find "a[data-feed-option-name='FeedDeleteOption']"
-    end
-  end
-
-  def confirm_delete_button
-    within 'div.uiOverlayFooter' do
-      find 'button.layerConfirm.uiOverlayButton'
-    end
-  end
-
   def delete_story(story)
     open_story_options(story)
-    delete_option.click
+
+    within story_options_menu do
+      delete_option.click
+    end
+
     confirm_delete_button.click
-    byebug
+    # lazy workaround to wait for AJAX to finish
+    sleep 2
+    puts 'Deleted a story.'
   end
 
   def open_story_options(story)
+    return true if has_story_options_menu?
+
     within story do
-      story_option_button.click
+      # using aria-label
+      find_link('Story options').click
     end
   end
 end
