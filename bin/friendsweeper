@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'commander/import'
+require 'io/console'
+require 'friendsweeper'
+
+program :name, 'friendsweeper'
+program :version, Friendsweeper::VERSION
+program :description, 'Quick tool to erase all evidence of a Facebook friendship'
+
+command :delete do |c|
+  c.syntax = 'friendsweeper delete'
+  c.description = 'Delete all public stories between you and a (former?) friend'
+  c.action do |args, options|
+    puts 'Make sure you know the Facebook usernames of both yourself and your friend. More info can be found at https://www.facebook.com/username'
+    username = ask 'Your Facebook username: '
+    friend_username = ask 'Username of friend you wish to erase: '
+
+    # TODO: make less awful
+    puts 'Launching Facebook! You have 12 seconds to login so the script can continue!'
+
+    friendship_page = FriendshipPage.new
+    friendship_page.load(user: username, friend: friend_username)
+    sleep 12
+
+    begin
+      friendship_page.delete_all_visible_stories
+    rescue Exception => e
+      puts e
+    end
+  end
+end

@@ -1,0 +1,1 @@
+require 'friendsweeper/pages/friendship'
