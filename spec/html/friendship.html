@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test Friendship</title>
+
+  <style>
+    body { font-size: 0.8em; }
+    div[role='article'] { border: 1px solid black; }
+    a[aria-label='Story options'] { float: right; }
+  </style>
+  <script type="text/javascript">
+    var menuForStory;
+
+    function toggleStoryOptionsMenu(storyId) {
+      var menu = document.querySelector('ul.story-options-menu');
+      menu.style.display == 'none' ? menu.style.display = 'block' : menu.style.display = 'none';
+      whichStory(storyId);
+    }
+    function toggleDeleteStoryDialog() {
+      document.querySelector('ul.story-options-menu').style.display = 'none';
+      dialog = document.getElementById('deleteStoryDialog');
+      dialog.style.display == 'none' ? dialog.style.display = 'block' : dialog.style.display = 'none';
+    }
+    function whichStory(storyId) { menuForStory = storyId; };
+    function confirmDeleteStory() { document.getElementById(menuForStory).remove(); toggleDeleteStoryDialog();  }
+  </script>
+</head>
+<body>
+  <div class="pagelet_bluebar">
+    <h1 class="title">Facespace</h1>
+  </div>
+  <div class="globalContainer">
+    <div class="uiLayer">
+      <div id="deleteStoryDialog" style="display: none;" role="dialog">
+        <h3>Delete Post</h3>
+        <p>Are you sure you want to delete this?</p>
+        <a class="layerCancel" role="button" href="#" onclick="toggleDeleteStoryDialog()">Cancel</a>
+        <button class="layerConfirm uiOverlayButton" type="submit" onclick="confirmDeleteStory()">Delete post</button>
+      </div>
+    </div>
+    <div class="contextualLayerPositioner uiLayer">
+      <ul class="story-options-menu" role="menu" style="display: none;">
+        <li data-feed-option-name="FeedSaveOption">Save post</li>
+        <li data-feed-option-name="FeedBackdateOption">Change Date</li>
+        <li data-feed-option-name="FeedFollowOption">Turn off notifications for this post</li>
+        <li data-feed-option-name="FeedPinConversationOption">Show in tab</li>
+        <li data-feed-option-name="NFXUnsubscribeAction">Unfollow Friend</li>
+        <li data-feed-option-name="FeedDeleteOption">
+          <a href="#" onclick="toggleDeleteStoryDialog()" data-feed-option-name="FeedDeleteOption">Delete</a>
+        </li>
+      </ul>
+    </div>
+    <div class="fb_content" role="main">
+      <div class="fbProfileCover">
+        <div class="name"><h2>You and FakeFriend McFoobar</h2></div>
+      </div>
+      <div role="feed">
+        <div id="story1" role="article">
+          <div class="fbUserContent">
+            <a aria-label="Story options" href="#" onclick="toggleStoryOptionsMenu('story1')" role="button">menu</a>
+            <h3 style="display: inline;">You =&gt; FakeFriend</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          </div>
+        </div>
+        <div id="story2" role="article">
+          <div class="fbUserContent">
+            <a aria-label="Story options" href="#" onclick="toggleStoryOptionsMenu('story2')" role="button">menu</a>
+            <h3 style="display: inline;">FakeFriend =&gt; You</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          </div>
+        </div>
+      </div>
+      <div role="feed">
+        <div id="story3" role="article">
+          <div class="fbUserContent">
+            <a aria-label="Story options" href="#" onclick="toggleStoryOptionsMenu('story3')" role="button">menu</a>
+            <h3 style="display: inline;">You =&gt; FakeFriend</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          </div>
+        </div>
+        <div id="story4" role="article">
+          <div class="fbUserContent">
+            <a aria-label="Story options" href="#" onclick="toggleStoryOptionsMenu('story4')" role="button">menu</a>
+            <h3 style="display: inline;">FakeFriend =&gt; You</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+            exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+          </div>
+        </div>
+      </div>
+      <div class="uiMorePager"></div>
+    </div>
+  </div>
+</body>
+</html>

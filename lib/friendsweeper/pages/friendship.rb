@@ -2,7 +2,7 @@ require 'capybara/dsl'
 require 'site_prism'
 
 class FriendshipPage < SitePrism::Page
-  set_url "https://www.facebook.com/friendship{/user}{/friend}"
+  set_url "/friendship{/user}{/friend}"
 
   element :main, ".fb_content[role='main']"
   elements :story_group, "[role='feed']"
@@ -11,7 +11,7 @@ class FriendshipPage < SitePrism::Page
   element :delete_option, "a[data-feed-option-name='FeedDeleteOption']"
   element :confirm_delete_button,
           :xpath,
-          "//button[contains( normalize-space( @class ), ' layerConfirm ' )]"
+          "//button[contains(@class, 'layerConfirm')]"
 
   def delete_latest_story
     within story_group.first do
@@ -34,13 +34,17 @@ class FriendshipPage < SitePrism::Page
   def delete_story(story)
     open_story_options(story)
 
+    wait_for_story_options_menu
+
     within story_options_menu do
       delete_option.click
     end
 
+    wait_for_confirm_delete_button
     confirm_delete_button.click
+
     # lazy workaround to wait for AJAX to finish
-    sleep 2
+    sleep 1
     puts 'Deleted a story.'
   end
 

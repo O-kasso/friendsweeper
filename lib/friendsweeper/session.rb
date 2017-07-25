@@ -1,8 +1,9 @@
 require 'capybara'
 require 'selenium-webdriver'
+require 'site_prism'
 
 module Session
-  chrome_switches = Selenium::WebDriver::Remote::Capabilities.chrome(
+  CHROME_SWITCHES = Selenium::WebDriver::Remote::Capabilities.chrome(
     chromeOptions: {
       args: [
         '--disable-notifications',
@@ -14,13 +15,24 @@ module Session
     }
   )
 
-  Capybara::Selenium::Driver.class_eval { def quit; end } # prevent browser quitting after execution completes
+  # prevent browser quitting after execution completes
+  Capybara::Selenium::Driver.class_eval { def quit; end }
+
   Capybara.register_driver :selenium do |app|
-    Capybara::Selenium::Driver.new(app,
-                                   browser: :chrome,
-                                   desired_capabilities: chrome_switches)
+    Capybara::Selenium::Driver.new(
+      app,
+      browser: :chrome,
+      desired_capabilities: CHROME_SWITCHES
+    )
   end
 
-  Capybara.default_driver = :selenium
-  Capybara.enable_aria_label = true
+  Capybara.configure do |c|
+    c.default_driver = :selenium
+    c.app_host = 'https://www.facebook.com'
+    c.enable_aria_label = true
+  end
+
+  SitePrism.configure do |config|
+    config.use_implicit_waits = true
+  end
 end
