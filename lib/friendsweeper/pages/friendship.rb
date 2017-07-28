@@ -20,6 +20,8 @@ class FriendshipPage < SitePrism::Page
   end
 
   def delete_all_visible_stories
+    wait_for_story_group
+
     story_group.each do |sg|
       within sg do
         stories.each do |s|
